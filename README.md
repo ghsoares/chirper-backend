@@ -11,4 +11,6 @@ As little birds enjoys talking in the nature, you can talk to other people reply
 
 This is a simple portfolio project created by a single soul to show it's development abilities, I hope you enjoy it!
 
+Frontend of the project: https://github.com/ghsoares/chirper-frontend
+
 (Live website link coming soon)
