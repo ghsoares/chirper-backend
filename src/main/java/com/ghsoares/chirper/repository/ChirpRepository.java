@@ -12,6 +12,6 @@ import com.ghsoares.chirper.model.Chirp;
 public interface ChirpRepository extends JpaRepository<Chirp, Long> {
 	public List<Chirp> findAllByAuthorUsername(String username);
 	public List<Chirp> findAllByTagsIn(List<String> tags);
-	@Query("Select COUNT(cl) FROM ChirpLike cl WHERE cl.chirp.chirpId=chirpId")
+	@Query("SELECT COUNT(cl) FROM ChirpLike cl WHERE cl.chirp.chirpId=chirpId")
 	public Long getLikeCount(Long chirpId);
 }
