@@ -30,6 +30,8 @@ public class User {
 	@NotNull(message = "The username can't be null")
 	private String username;
 	
+	private String bio;
+	
 	@NotNull(message = "The email can't be null")
 	private String email;
 	
@@ -56,7 +58,7 @@ public class User {
 	public User(Long userId) {
 		this.userId = userId;
 	}
-	
+
 	public Long getUserId() {
 		return userId;
 	}
@@ -67,6 +69,10 @@ public class User {
 
 	public String getUsername() {
 		return username;
+	}
+
+	public String getBio() {
+		return bio;
 	}
 
 	public String getEmail() {
@@ -103,6 +109,10 @@ public class User {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public void setBio(String bio) {
+		this.bio = bio;
 	}
 
 	public void setEmail(String email) {
