@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ghsoares.chirper.model.Chirp;
 import com.ghsoares.chirper.repository.ChirpRepository;
@@ -59,32 +60,32 @@ public class ChirpController {
 	@PostMapping("/create")
 	public ResponseEntity<Chirp> createChirp(@Valid @RequestBody Chirp chirp) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
-		if (auth.isPresent()) {
-			return chirpService.createChirp(auth.get().getUserId(), chirp).map(resp -> ResponseEntity.ok(resp))
-					.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+		if (auth.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
 		}
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		return chirpService.createChirp(auth.get().getUserId(), chirp).map(resp -> ResponseEntity.ok(resp))
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
 	@PutMapping("/update")
 	public ResponseEntity<Chirp> updateChirp(@Valid @RequestBody Chirp chirp) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
-		if (auth.isPresent()) {
-			return chirpService.updateChirp(auth.get().getUserId(), chirp)
-					.map(resp -> ResponseEntity.status(HttpStatus.OK).body(resp))
-					.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+		if (auth.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
 		}
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		return chirpService.updateChirp(auth.get().getUserId(), chirp)
+				.map(resp -> ResponseEntity.status(HttpStatus.OK).body(resp))
+				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Chirp> deleteById(@PathVariable Long id) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
-		if (auth.isPresent()) {
-			return chirpService.deleteChirp(auth.get().getUserId(), id)
-					.map(resp -> ResponseEntity.ok(resp))
-					.orElse(ResponseEntity.notFound().build());
+		if (auth.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
 		}
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		return chirpService.deleteChirp(auth.get().getUserId(), id)
+				.map(resp -> ResponseEntity.ok(resp))
+				.orElse(ResponseEntity.notFound().build());
 	}
 }

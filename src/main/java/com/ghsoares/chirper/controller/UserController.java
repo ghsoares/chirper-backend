@@ -1,13 +1,13 @@
 package com.ghsoares.chirper.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.ghsoares.chirper.model.User;
 import com.ghsoares.chirper.model.ChirpLike;
 import com.ghsoares.chirper.repository.UserRepository;
+import com.ghsoares.chirper.security.SecurityUtils;
 import com.ghsoares.chirper.security.UserDetailsImpl;
 import com.ghsoares.chirper.service.ChirpService;
 import com.ghsoares.chirper.service.UserService;
@@ -82,23 +84,33 @@ public class UserController {
 	
 	@PutMapping("/update")
 	public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
-		return userService.updateUser(user)
+		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
+		if (auth.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
+		}
+		return userService.updateUser(auth.get().getUserId(), user)
 			.map(resp -> ResponseEntity.status(HttpStatus.OK).body(resp))
 			.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
 	@PutMapping("/like/{chirpId}")
 	public ResponseEntity<ChirpLike> userLikeChirp(@PathVariable Long chirpId) {
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return chirpService.likeChirp(userDetails.getUserId(), chirpId)
+		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
+		if (auth.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
+		}
+		return chirpService.likeChirp(auth.get().getUserId(), chirpId)
 				.map(resp -> ResponseEntity.status(HttpStatus.OK).body(resp))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
 	@PutMapping("/unlike/{chirpId}")
 	public ResponseEntity<ChirpLike> userUnlikeChirp(@PathVariable Long chirpId) {
-		UserDetailsImpl userDetails = (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return chirpService.unlikeChirp(userDetails.getUserId(), chirpId)
+		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
+		if (auth.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
+		}
+		return chirpService.unlikeChirp(auth.get().getUserId(), chirpId)
 				.map(resp -> ResponseEntity.status(HttpStatus.OK).body(resp))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
