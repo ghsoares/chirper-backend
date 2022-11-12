@@ -48,6 +48,9 @@ public class BasicSecurityConfig {
 			.antMatchers("/user/unlike/{chirpId}").hasAuthority("USER")
 			
 			.antMatchers("/chirp/all").permitAll()
+			.antMatchers("/chirp/range").permitAll()
+			.antMatchers("/chirp/page").permitAll()
+			.antMatchers("/chirp/id").permitAll()
 			.antMatchers("/chirp/by-user/{username}").permitAll()
 			.antMatchers("/chirp/by-tags/{tags}").permitAll()
 			.antMatchers("/chirp/delete").hasAuthority("USER")

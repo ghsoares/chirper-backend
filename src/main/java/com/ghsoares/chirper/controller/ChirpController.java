@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,11 +17,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ghsoares.chirper.model.Chirp;
 import com.ghsoares.chirper.repository.ChirpRepository;
+import com.ghsoares.chirper.repository.OffsetLimitPageable;
 import com.ghsoares.chirper.security.SecurityUtils;
 import com.ghsoares.chirper.security.UserDetailsImpl;
 import com.ghsoares.chirper.service.ChirpService;
@@ -38,6 +41,16 @@ public class ChirpController {
 	@GetMapping("/all")
 	public ResponseEntity<List<Chirp>> getAll() {
 		return ResponseEntity.ok(chirpRepository.findAll());
+	}
+	
+	@GetMapping("/range")
+	public ResponseEntity<List<Chirp>> getRange(@RequestParam int start, @RequestParam int count) {
+		return ResponseEntity.ok(chirpRepository.findAll(OffsetLimitPageable.of(start, count)).getContent());
+	}
+	
+	@GetMapping("/page")
+	public ResponseEntity<List<Chirp>> getPage(@RequestParam int page, @RequestParam int count) {
+		return ResponseEntity.ok(chirpRepository.findAll(PageRequest.of(page, count)).getContent());
 	}
 	
 	@GetMapping("/id/{id}")
