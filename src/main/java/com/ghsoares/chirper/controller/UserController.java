@@ -52,9 +52,9 @@ public class UserController {
 			.orElse(ResponseEntity.notFound().build());
 	}
 	
-	@GetMapping("/name/{name}")
-	public ResponseEntity<List<User>> getAllByName(@PathVariable String name){
-		return ResponseEntity.ok(userRepository.findAllByNameContainingIgnoreCase(name));
+	@GetMapping("/profile/{profileName}")
+	public ResponseEntity<List<User>> getAllByProfileName(@PathVariable String profileName){
+		return ResponseEntity.ok(userRepository.findAllByProfileNameContainingIgnoreCase(profileName));
 	}
 	
 	@GetMapping("/username/{username}")
