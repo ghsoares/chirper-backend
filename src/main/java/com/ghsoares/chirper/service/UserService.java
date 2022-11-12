@@ -26,7 +26,11 @@ public class UserService {
 		return Optional.of(userRepository.save(user));
 	}
 	
-	public Optional<User> updateUser(User user) {
+	public Optional<User> updateUser(Long userId, User user) {
+		if (userId != user.getUserId()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trying to update a different user", null);
+		}
+		
 		if (userRepository.findById(user.getUserId()).isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't exist", null);
 		}
