@@ -44,12 +44,14 @@ public class UserController {
 	public ResponseEntity<List<User>> getAll() {
 		return ResponseEntity.ok(userRepository.findAll());
 	}
+	
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> getById(@PathVariable Long id) {
 		return userRepository.findById(id)
 			.map(resp -> ResponseEntity.ok(resp))
 			.orElse(ResponseEntity.notFound().build());
 	}
+	
 	@GetMapping("/name/{name}")
 	public ResponseEntity<List<User>> getAllByName(@PathVariable String name){
 		return ResponseEntity.ok(userRepository.findAllByNameContainingIgnoreCase(name));
@@ -115,11 +117,16 @@ public class UserController {
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/delete/id/{id}")
 	public ResponseEntity<User> deleteById(@PathVariable Long id) {
 		return userService.deleteUser(id)
 				.map(resp -> ResponseEntity.ok(resp))
 				.orElse(ResponseEntity.notFound().build());
+	}
+	
+	@DeleteMapping("/delete/all")
+	public void deleteAll() {
+		userRepository.deleteAll();
 	}
 }
 

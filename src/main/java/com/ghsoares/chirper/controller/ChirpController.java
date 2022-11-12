@@ -78,7 +78,7 @@ public class ChirpController {
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@DeleteMapping("/delete/{id}")
+	@DeleteMapping("/delete/id/{id}")
 	public ResponseEntity<Chirp> deleteById(@PathVariable Long id) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
 		if (auth.isEmpty()) {
@@ -87,5 +87,10 @@ public class ChirpController {
 		return chirpService.deleteChirp(auth.get().getUserId(), id)
 				.map(resp -> ResponseEntity.ok(resp))
 				.orElse(ResponseEntity.notFound().build());
+	}
+	
+	@DeleteMapping("/delete/all")
+	public void deleteAll() {
+		chirpRepository.deleteAll();
 	}
 }
