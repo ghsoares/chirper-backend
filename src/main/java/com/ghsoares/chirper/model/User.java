@@ -24,8 +24,8 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long userId;
 	
-	@NotNull(message = "The name can't be null")
-	private String name;
+	@NotNull(message = "The profile name can't be null")
+	private String profileName;
 	
 	@NotNull(message = "The username can't be null")
 	private String username;
@@ -63,8 +63,8 @@ public class User {
 		return userId;
 	}
 
-	public String getName() {
-		return name;
+	public String getProfileName() {
+		return profileName;
 	}
 
 	public String getUsername() {
@@ -103,8 +103,8 @@ public class User {
 		this.userId = userId;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
 	}
 
 	public void setUsername(String username) {
