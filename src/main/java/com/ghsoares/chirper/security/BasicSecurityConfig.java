@@ -57,7 +57,7 @@ public class BasicSecurityConfig {
 			.antMatchers("/chirp/update").hasAuthority("USER")
 			.antMatchers("/chirp/delete").hasAuthority("USER")
 			
-			.anyRequest().authenticated()
+			.anyRequest().hasAuthority("ADMIN")
 			
 			.and().authenticationManager(authenticationManager(http))
 			
