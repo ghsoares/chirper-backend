@@ -11,11 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -40,51 +40,51 @@ public class UserController {
 	@Autowired
 	public ChirpService chirpService;
 	
-	@GetMapping("/all")
+	@GetMapping(path = "/list")
 	public ResponseEntity<List<User>> getAll() {
 		return ResponseEntity.ok(userRepository.findAll());
 	}
 	
-	@GetMapping("/id/{id}")
-	public ResponseEntity<User> getById(@PathVariable Long id) {
+	@GetMapping(path = "/find", params = {"id"})
+	public ResponseEntity<User> getById(@RequestParam Long id) {
 		return userRepository.findById(id)
 			.map(resp -> ResponseEntity.ok(resp))
 			.orElse(ResponseEntity.notFound().build());
 	}
 	
-	@GetMapping("/profile/{profileName}")
-	public ResponseEntity<List<User>> getAllByProfileName(@PathVariable String profileName){
-		return ResponseEntity.ok(userRepository.findAllByProfileNameContainingIgnoreCase(profileName));
+	@GetMapping(path = "/find", params = {"name"})
+	public ResponseEntity<List<User>> getAllByProfileName(@RequestParam String name){
+		return ResponseEntity.ok(userRepository.findAllByProfileNameContainingIgnoreCase(name));
 	}
 	
-	@GetMapping("/username/{username}")
-	public ResponseEntity<User> getByUsername(@PathVariable String username){
+	@GetMapping(path = "/find", params = {"username"})
+	public ResponseEntity<User> getByUsername(@RequestParam String username){
 		return userRepository.findByUsername(username)
 				.map(resp -> ResponseEntity.ok(resp))
 				.orElse(ResponseEntity.notFound().build());
 	}
 	
-	@GetMapping("/email/{email}")
-	public ResponseEntity<User> getByEmail(@PathVariable String email){
+	@GetMapping(path = "/find", params = {"email"})
+	public ResponseEntity<User> getByEmail(@RequestParam String email){
 		return userRepository.findByEmail(email)
 				.map(resp -> ResponseEntity.ok(resp))
 				.orElse(ResponseEntity.notFound().build());
 	}
 	
-	@PostMapping("/login")
+	@PostMapping(path = "/login")
 	public ResponseEntity<User> loginUser(@RequestBody User user) {
 		return userService.authUser(user).map(resp -> ResponseEntity.ok(resp))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@PostMapping("/register")
+	@PostMapping(path = "/register")
 	public ResponseEntity<User> registerUser(@Valid @RequestBody User user) {
 		return userService.registerUser(user)
 				.map(resp -> ResponseEntity.status(HttpStatus.CREATED).body(resp))
 				.orElse(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
 	}
 	
-	@PutMapping("/update")
+	@PutMapping(path = "/update")
 	public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
 		if (auth.isEmpty()) {
@@ -95,36 +95,36 @@ public class UserController {
 			.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@PutMapping("/like/{chirpId}")
-	public ResponseEntity<ChirpLike> userLikeChirp(@PathVariable Long chirpId) {
+	@PutMapping(path = "/like", params = {"chirp-id"})
+	public ResponseEntity<ChirpLike> userLikeChirp(@RequestParam("chirp-id") Long id) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
 		if (auth.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
 		}
-		return chirpService.likeChirp(auth.get().getUserId(), chirpId)
+		return chirpService.likeChirp(auth.get().getUserId(), id)
 				.map(resp -> ResponseEntity.status(HttpStatus.OK).body(resp))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@PutMapping("/unlike/{chirpId}")
-	public ResponseEntity<ChirpLike> userUnlikeChirp(@PathVariable Long chirpId) {
+	@PutMapping(path = "/unlike", params = {"chirp-id"})
+	public ResponseEntity<ChirpLike> userUnlikeChirp(@RequestParam("chirp-id") Long id) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
 		if (auth.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
 		}
-		return chirpService.unlikeChirp(auth.get().getUserId(), chirpId)
+		return chirpService.unlikeChirp(auth.get().getUserId(), id)
 				.map(resp -> ResponseEntity.status(HttpStatus.OK).body(resp))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@DeleteMapping("/delete/id/{id}")
-	public ResponseEntity<User> deleteById(@PathVariable Long id) {
+	@DeleteMapping(path = "/delete", params = {"chirp-id"})
+	public ResponseEntity<User> deleteById(@RequestParam("chirp-id") Long id) {
 		return userService.deleteUser(id)
 				.map(resp -> ResponseEntity.ok(resp))
 				.orElse(ResponseEntity.notFound().build());
 	}
 	
-	@DeleteMapping("/delete/all")
+	@DeleteMapping(path = "/delete/all")
 	public void deleteAll() {
 		userRepository.deleteAll();
 	}

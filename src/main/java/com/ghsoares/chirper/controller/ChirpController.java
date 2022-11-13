@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,39 +37,44 @@ public class ChirpController {
 	@Autowired
 	public ChirpService chirpService;
 	
-	@GetMapping("/all")
+	@GetMapping(path = "/list")
 	public ResponseEntity<List<Chirp>> getAll() {
 		return ResponseEntity.ok(chirpRepository.findAll());
 	}
 	
-	@GetMapping("/range")
-	public ResponseEntity<List<Chirp>> getRange(@RequestParam int start, @RequestParam int count) {
+	@GetMapping(path = "/list", params = {"start", "count"})
+	public ResponseEntity<List<Chirp>> getAllRange(@RequestParam int start, @RequestParam int count) {
 		return ResponseEntity.ok(chirpRepository.findAll(OffsetLimitPageable.of(start, count)).getContent());
 	}
 	
-	@GetMapping("/page")
-	public ResponseEntity<List<Chirp>> getPage(@RequestParam int page, @RequestParam int count) {
+	@GetMapping(path = "/list", params = {"page", "count"})
+	public ResponseEntity<List<Chirp>> getAllPage(@RequestParam int page, @RequestParam int count) {
 		return ResponseEntity.ok(chirpRepository.findAll(PageRequest.of(page, count)).getContent());
 	}
 	
-	@GetMapping("/id/{id}")
-	public ResponseEntity<Chirp> getById(@PathVariable Long id) {
+	@GetMapping(path = "/main")
+	public ResponseEntity<List<Chirp>> getMain() {
+		return ResponseEntity.ok(chirpRepository.findAllMain());
+	}
+	
+	@GetMapping(path = "/find", params = {"id"})
+	public ResponseEntity<Chirp> getById(@RequestParam Long id) {
 		return chirpRepository.findById(id)
 			.map(resp -> ResponseEntity.ok(resp))
 			.orElse(ResponseEntity.notFound().build());
 	}
 	
-	@GetMapping("/by-user/{username}")
-	public ResponseEntity<List<Chirp>> getAllByUser(@PathVariable String username){
+	@GetMapping(path = "/find", params = {"username"})
+	public ResponseEntity<List<Chirp>> getAllByUser(@RequestParam String username){
 		return ResponseEntity.ok(chirpRepository.findAllByAuthorUsername(username));
 	}
 	
-	@GetMapping("/by-tags/{tags}")
-	public ResponseEntity<List<Chirp>> getAllByTags(@PathVariable List<String> tags){
+	@GetMapping(path = "/find", params = {"tags"})
+	public ResponseEntity<List<Chirp>> getAllByTags(@RequestParam List<String> tags){
 		return ResponseEntity.ok(chirpRepository.findAllByTagsIn(tags));
 	}
 	
-	@PostMapping("/create")
+	@PostMapping(path = "/create")
 	public ResponseEntity<Chirp> createChirp(@Valid @RequestBody Chirp chirp) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
 		if (auth.isEmpty()) {
@@ -80,7 +84,7 @@ public class ChirpController {
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@PutMapping("/update")
+	@PutMapping(path = "/update")
 	public ResponseEntity<Chirp> updateChirp(@Valid @RequestBody Chirp chirp) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
 		if (auth.isEmpty()) {
@@ -91,8 +95,8 @@ public class ChirpController {
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@DeleteMapping("/delete/id/{id}")
-	public ResponseEntity<Chirp> deleteById(@PathVariable Long id) {
+	@DeleteMapping(path = "/delete", params = {"id"})
+	public ResponseEntity<Chirp> deleteById(@RequestParam Long id) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
 		if (auth.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
@@ -102,7 +106,7 @@ public class ChirpController {
 				.orElse(ResponseEntity.notFound().build());
 	}
 	
-	@DeleteMapping("/delete/all")
+	@DeleteMapping(path = "/delete/all")
 	public void deleteAll() {
 		chirpRepository.deleteAll();
 	}
