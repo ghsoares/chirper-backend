@@ -14,4 +14,6 @@ public interface ChirpRepository extends JpaRepository<Chirp, Long> {
 	public List<Chirp> findAllByTagsIn(List<String> tags);
 	@Query("SELECT COUNT(cl) FROM ChirpLike cl WHERE cl.chirp.chirpId=chirpId")
 	public Long getLikeCount(Long chirpId);
+	@Query("SELECT c FROM Chirp c WHERE c.replyOf IS NULL")
+	public List<Chirp> findAllMain();
 }
