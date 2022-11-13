@@ -1,5 +1,6 @@
 package com.ghsoares.chirper.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,6 +18,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
@@ -37,6 +39,12 @@ public class Chirp {
 	
 	@NotNull(message = "The body can't be null")
 	private String body;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private LocalDate creationDate;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private LocalDate editDate;
 	
 	@ElementCollection
 	@CollectionTable(name = "chirp_tags")
@@ -66,6 +74,14 @@ public class Chirp {
 		return body;
 	}
 
+	public LocalDate getCreationDate() {
+		return creationDate;
+	}
+
+	public LocalDate getEditDate() {
+		return editDate;
+	}
+
 	public Set<String> getTags() {
 		return tags;
 	}
@@ -92,6 +108,14 @@ public class Chirp {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public void setCreationDate(LocalDate creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public void setEditDate(LocalDate editDate) {
+		this.editDate = editDate;
 	}
 
 	public void setTags(Set<String> tags) {
