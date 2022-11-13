@@ -43,20 +43,14 @@ public class BasicSecurityConfig {
 			.antMatchers("/user/login").permitAll()
 			.antMatchers("/user/register").permitAll()
 			.antMatchers("/user/update").hasAuthority("USER")
+			.antMatchers("/user/like").hasAuthority("USER")
+			.antMatchers("/user/unlike").hasAuthority("USER")
 			
-			.antMatchers("/user/like/{chirpId}").hasAuthority("USER")
-			.antMatchers("/user/unlike/{chirpId}").hasAuthority("USER")
-			
-			.antMatchers("/chirp/all").permitAll()
-			.antMatchers("/chirp/range").permitAll()
-			.antMatchers("/chirp/page").permitAll()
-			.antMatchers("/chirp/id").permitAll()
-			.antMatchers("/chirp/by-user/{username}").permitAll()
-			.antMatchers("/chirp/by-tags/{tags}").permitAll()
+			.antMatchers("/chirp/list").permitAll()
+			.antMatchers("/chirp/main").permitAll()
+			.antMatchers("/chirp/find").permitAll()
 			.antMatchers("/chirp/delete").hasAuthority("USER")
-			
 			.antMatchers("/chirp/create").hasAuthority("USER")
-//			.antMatchers("/chirp/reply").hasAuthority("USER")
 			.antMatchers("/chirp/update").hasAuthority("USER")
 			.antMatchers("/chirp/delete").hasAuthority("USER")
 			
