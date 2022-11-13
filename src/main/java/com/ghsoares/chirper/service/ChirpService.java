@@ -1,5 +1,6 @@
 package com.ghsoares.chirper.service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class ChirpService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't exist", null);
 		}
 		chirp.setAuthor(user.get());
+		chirp.setCreationDate(LocalDate.now());
+		chirp.setEditDate(chirp.getCreationDate());
 		return Optional.of(chirpRepository.save(chirp));
 	}
 	
@@ -47,7 +50,8 @@ public class ChirpService {
 		if (user.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't exist", null);
 		}
-	
+		
+		chirp.setEditDate(LocalDate.now());
 		return Optional.of(chirpRepository.save(chirp));
 	}
 	
