@@ -47,7 +47,7 @@ public class User {
 	private List<Chirp> chirps = new ArrayList<Chirp>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-	@JsonIgnoreProperties({ "user", "chirp" })
+	@JsonIgnoreProperties({ "user" })
 	private List<ChirpLike> likes = new ArrayList<ChirpLike>();
 	
 	@Transient

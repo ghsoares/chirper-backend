@@ -21,7 +21,7 @@ public class ChirpLike {
 	private User user;
 	
 	@ManyToOne
-	@JsonIgnoreProperties({ "likes" })
+	@JsonIgnoreProperties({ "replies", "likes" })
 	private Chirp chirp;
 
 	public Long getLikeId() {
