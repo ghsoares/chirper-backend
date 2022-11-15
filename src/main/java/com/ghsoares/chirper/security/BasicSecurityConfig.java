@@ -40,16 +40,20 @@ public class BasicSecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
+			.antMatchers("/user/list").permitAll()
+			.antMatchers("/user/search").permitAll()
+			.antMatchers("/user/find").permitAll()
 			.antMatchers("/user/login").permitAll()
 			.antMatchers("/user/register").permitAll()
 			.antMatchers("/user/update").hasAuthority("USER")
+			.antMatchers("/user/update-password").hasAuthority("USER")
 			.antMatchers("/user/like").hasAuthority("USER")
 			.antMatchers("/user/unlike").hasAuthority("USER")
 			
 			.antMatchers("/chirp/list").permitAll()
-			.antMatchers("/chirp/main").permitAll()
+			.antMatchers("/chirp/not-reply").permitAll()
+			.antMatchers("/chirp/search").permitAll()
 			.antMatchers("/chirp/find").permitAll()
-			.antMatchers("/chirp/delete").hasAuthority("USER")
 			.antMatchers("/chirp/create").hasAuthority("USER")
 			.antMatchers("/chirp/update").hasAuthority("USER")
 			.antMatchers("/chirp/delete").hasAuthority("USER")
