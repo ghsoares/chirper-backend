@@ -22,27 +22,43 @@ public class UserService {
 				.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exist", null);
 		}
+		user.setToken(SecurityUtils.generateBasicToken(user.getUsername(), user.getPassword()));
 		user.setPassword(SecurityUtils.encodeString(user.getPassword()));
 		return Optional.of(userRepository.save(user));
 	}
 	
 	public Optional<User> updateUser(Long userId, User user) {
-		if (userId != user.getUserId()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trying to update a different user", null);
-		}
+		Optional<User> prevUser = userRepository.findById(userId);
 		
-		if (userRepository.findById(user.getUserId()).isEmpty()) {
+		if (prevUser.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't exist", null);
 		}
 		
 		Optional<User> searchUser = userRepository.findTopByUsernameOrEmail(user.getUsername(),
 				user.getEmail());
 
-		if (searchUser.isPresent() && (searchUser.get().getUserId() != user.getUserId())) {
+		if (searchUser.isPresent() && (searchUser.get().getUserId() != userId)) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exist", null);
 		}
+		
+		prevUser.get().setProfileName(user.getProfileName());
+		prevUser.get().setUsername(user.getUsername());
+		prevUser.get().setBio(user.getBio());
 
-		user.setPassword(SecurityUtils.encodeString(user.getPassword()));
+		return Optional.of(userRepository.save(prevUser.get()));
+	}
+	
+	public Optional<User> updateUserPassword(Long userId, String newPassword) {
+		Optional<User> prevUser = userRepository.findById(userId);
+		
+		if (prevUser.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't exist", null);
+		}
+		
+		User user = prevUser.get();
+		
+		user.setToken(SecurityUtils.generateBasicToken(user.getUsername(), newPassword));
+		user.setPassword(SecurityUtils.encodeString(newPassword));
 		return Optional.of(userRepository.save(user));
 	}
 	

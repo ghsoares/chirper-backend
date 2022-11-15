@@ -1,7 +1,11 @@
 package com.ghsoares.chirper.service;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +38,7 @@ public class ChirpService {
 		chirp.setAuthor(user.get());
 		chirp.setCreationDate(LocalDate.now());
 		chirp.setEditDate(chirp.getCreationDate());
+		chirp.setTags(getBodyTags(chirp.getBody()));
 		return Optional.of(chirpRepository.save(chirp));
 	}
 	
@@ -94,5 +99,18 @@ public class ChirpService {
 		
 		chirpRepository.deleteById(id);
 		return chirp;
+	}
+
+	private Set<String> getBodyTags(String body) {
+		Pattern pattern = Pattern.compile("#(\\w+)");
+		Matcher matcher = pattern.matcher(body);
+		
+		HashSet<String> tags = new HashSet<String>();
+		
+		while (matcher.find()) {
+			tags.add(matcher.group(1));
+		}
+		
+		return tags;
 	}
 }
