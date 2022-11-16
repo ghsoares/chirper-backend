@@ -46,9 +46,9 @@ public class BasicSecurityConfig {
 			.antMatchers("/user/login").permitAll()
 			.antMatchers("/user/register").permitAll()
 			.antMatchers("/user/update").hasAuthority("USER")
+			.antMatchers("/user/follow").hasAuthority("USER")
+			.antMatchers("/user/unfollow").hasAuthority("USER")
 			.antMatchers("/user/update-password").hasAuthority("USER")
-			.antMatchers("/user/like").hasAuthority("USER")
-			.antMatchers("/user/unlike").hasAuthority("USER")
 			
 			.antMatchers("/chirp/list").permitAll()
 			.antMatchers("/chirp/not-reply").permitAll()
@@ -56,6 +56,8 @@ public class BasicSecurityConfig {
 			.antMatchers("/chirp/find").permitAll()
 			.antMatchers("/chirp/create").hasAuthority("USER")
 			.antMatchers("/chirp/update").hasAuthority("USER")
+			.antMatchers("/chirp/like").hasAuthority("USER")
+			.antMatchers("/chirp/unlike").hasAuthority("USER")
 			.antMatchers("/chirp/delete").hasAuthority("USER")
 			
 			.anyRequest().hasAuthority("ADMIN")
