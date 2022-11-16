@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -163,9 +164,10 @@ public class ChirpController {
 		Optional<Integer> offset, 
 		Optional<Integer> count
 	) {
-		Pageable pageable = Pageable.unpaged();
+		Sort sort = Sort.by("creationDate").descending();
+		Pageable pageable = OffsetLimitPageable.unpaged(sort);
 		if (offset.isPresent() || count.isPresent()) {
-			pageable = OffsetLimitPageable.of(offset.orElse(0), count.orElse(5));
+			pageable = OffsetLimitPageable.of(offset.orElse(0), count.orElse(5), sort);
 		}
 		return pageable;
 	}
