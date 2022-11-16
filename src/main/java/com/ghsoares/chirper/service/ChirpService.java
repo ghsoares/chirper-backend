@@ -60,6 +60,7 @@ public class ChirpService {
 		
 		if (chirp.getBody() != null) {
 			prevChirp.get().setBody(chirp.getBody());
+			prevChirp.get().setTags(getBodyTags(chirp.getBody()));
 		}
 		
 		prevChirp.get().setEditDate(LocalDateTime.now());
