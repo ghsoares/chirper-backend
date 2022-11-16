@@ -16,9 +16,13 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
 @Entity
 @Table(name = "tb_user")
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,12 +43,21 @@ public class User {
 	private String password;
 	
 	@NotNull(message = "The birth date can't be null")
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDate birthDate;
 	
 	@OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
 	@JsonIgnoreProperties({ "author" })
 	private List<Chirp> chirps = new ArrayList<Chirp>();
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	@JsonIgnoreProperties({ "user" })
+	private List<UserFollower> followers = new ArrayList<UserFollower>();
+	
+	@OneToMany(mappedBy = "follower", cascade = CascadeType.ALL)
+	@JsonIgnoreProperties({ "follower" })
+	private List<UserFollower> follows = new ArrayList<UserFollower>();
 	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	@JsonIgnoreProperties({ "user" })
@@ -54,7 +67,7 @@ public class User {
 	private String token;
 
 	public User() {}
-
+	
 	public User(Long userId) {
 		this.userId = userId;
 	}
@@ -89,6 +102,14 @@ public class User {
 
 	public List<Chirp> getChirps() {
 		return chirps;
+	}
+
+	public List<UserFollower> getFollowers() {
+		return followers;
+	}
+
+	public List<UserFollower> getFollows() {
+		return follows;
 	}
 
 	public List<ChirpLike> getLikes() {
@@ -129,6 +150,14 @@ public class User {
 
 	public void setChirps(List<Chirp> chirps) {
 		this.chirps = chirps;
+	}
+
+	public void setFollowers(List<UserFollower> followers) {
+		this.followers = followers;
+	}
+
+	public void setFollows(List<UserFollower> follows) {
+		this.follows = follows;
 	}
 
 	public void setLikes(List<ChirpLike> likes) {

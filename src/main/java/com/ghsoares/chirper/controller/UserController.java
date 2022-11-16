@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ghsoares.chirper.model.User;
-import com.ghsoares.chirper.model.ChirpLike;
+import com.ghsoares.chirper.model.UserFollower;
 import com.ghsoares.chirper.repository.OffsetLimitPageable;
 import com.ghsoares.chirper.repository.UserRepository;
 import com.ghsoares.chirper.security.SecurityUtils;
@@ -114,8 +115,8 @@ public class UserController {
 				.orElse(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
 	}
 	
-	@PutMapping(path = "/update")
-	public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+	@PatchMapping(path = "/update")
+	public ResponseEntity<User> updateUser(@RequestBody User user) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
 		if (auth.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
@@ -136,24 +137,24 @@ public class UserController {
 			.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@PutMapping(path = "/like", params = { "chirp-id" })
-	public ResponseEntity<ChirpLike> userLikeChirp(@RequestParam("chirp-id") Long id) {
+	@PutMapping(path = "/follow", params = { "user-id" })
+	public ResponseEntity<UserFollower> follow(@RequestParam("user-id") Long userId) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
 		if (auth.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
 		}
-		return chirpService.likeChirp(auth.get().getUserId(), id)
+		return userService.followUser(auth.get().getUserId(), userId)
 				.map(resp -> ResponseEntity.status(HttpStatus.OK).body(resp))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}
 	
-	@PutMapping(path = "/unlike", params = { "chirp-id" })
-	public ResponseEntity<ChirpLike> userUnlikeChirp(@RequestParam("chirp-id") Long id) {
+	@PutMapping(path = "/unfollow", params = { "user-id" })
+	public ResponseEntity<UserFollower> unfollow(@RequestParam("user-id") Long userId) {
 		Optional<UserDetailsImpl> auth = SecurityUtils.getUserDetails();
 		if (auth.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not logged in", null);
 		}
-		return chirpService.unlikeChirp(auth.get().getUserId(), id)
+		return userService.unfollowUser(auth.get().getUserId(), userId)
 				.map(resp -> ResponseEntity.status(HttpStatus.OK).body(resp))
 				.orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 	}

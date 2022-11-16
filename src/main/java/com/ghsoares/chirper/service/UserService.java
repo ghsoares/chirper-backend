@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ghsoares.chirper.model.User;
+import com.ghsoares.chirper.model.UserFollower;
+import com.ghsoares.chirper.repository.UserFollowerRepository;
 import com.ghsoares.chirper.repository.UserRepository;
 import com.ghsoares.chirper.security.SecurityUtils;
 
@@ -17,13 +19,16 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	private UserFollowerRepository userFollowerRepository;
+	
 	public Optional<User> registerUser(User user) {
 		if (userRepository.findTopByUsernameOrEmail(user.getUsername(), user.getEmail())
 				.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exist", null);
 		}
-		user.setToken(SecurityUtils.generateBasicToken(user.getUsername(), user.getPassword()));
 		user.setPassword(SecurityUtils.encodeString(user.getPassword()));
+		user.setBio(user.getProfileName() + " is new to Chirper!");
 		return Optional.of(userRepository.save(user));
 	}
 	
@@ -41,9 +46,21 @@ public class UserService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exist", null);
 		}
 		
-		prevUser.get().setProfileName(user.getProfileName());
-		prevUser.get().setUsername(user.getUsername());
-		prevUser.get().setBio(user.getBio());
+		if (user.getProfileName() != null) {
+			prevUser.get().setProfileName(user.getProfileName());
+		}
+		if (user.getUsername() != null) {
+			prevUser.get().setUsername(user.getUsername());
+		}
+		if (user.getEmail() != null) {
+			prevUser.get().setEmail(user.getEmail());
+		}
+		if (user.getBirthDate() != null) {
+			prevUser.get().setBirthDate(user.getBirthDate());
+		}
+		if (user.getBio() != null) {
+			prevUser.get().setBio(user.getBio());
+		}
 
 		return Optional.of(userRepository.save(prevUser.get()));
 	}
@@ -77,6 +94,33 @@ public class UserService {
 		user.get().setToken(token);
 
 		return user;
+	}
+	
+	public Optional<UserFollower> followUser(Long userId, Long followUserId) {
+		Optional<User> user = userRepository.findById(followUserId);
+		if (user.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't exist", null);
+		}
+		
+		if (userFollowerRepository.findByUserUserIdAndFollowerUserId(followUserId, userId).isPresent()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already follows this user", null);
+		}
+		
+		UserFollower follow = new UserFollower();
+		follow.setUser(user.get());
+		follow.setFollower(new User(userId));
+		return Optional.of(userFollowerRepository.save(follow));
+	}
+	
+	public Optional<UserFollower> unfollowUser(Long userId, Long followUserId) {
+		Optional<UserFollower> follow = userFollowerRepository.findByUserUserIdAndFollowerUserId(followUserId, userId);
+		
+		if (follow.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Either user or follower doesn't exist", null);
+		}
+		
+		userFollowerRepository.deleteById(follow.get().getUserFollowerId());
+		return follow;
 	}
 	
 	public Optional<User> deleteUser(Long id) {
