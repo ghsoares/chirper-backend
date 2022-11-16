@@ -1,6 +1,6 @@
 package com.ghsoares.chirper.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,9 +20,13 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 
 @Entity
 @Table(name="tb_chirp")
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 /**
  * @author Gabriel
  * Chirp is the equivalent of a tweet for twitter,
@@ -40,11 +44,13 @@ public class Chirp {
 	@NotNull(message = "The body can't be null")
 	private String body;
 	
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private LocalDate creationDate;
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime creationDate;
 	
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private LocalDate editDate;
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	private LocalDateTime editDate;
 	
 	@ElementCollection
 	@CollectionTable(name = "chirp_tags")
@@ -74,11 +80,11 @@ public class Chirp {
 		return body;
 	}
 
-	public LocalDate getCreationDate() {
+	public LocalDateTime getCreationDate() {
 		return creationDate;
 	}
 
-	public LocalDate getEditDate() {
+	public LocalDateTime getEditDate() {
 		return editDate;
 	}
 
@@ -110,11 +116,11 @@ public class Chirp {
 		this.body = body;
 	}
 
-	public void setCreationDate(LocalDate creationDate) {
+	public void setCreationDate(LocalDateTime creationDate) {
 		this.creationDate = creationDate;
 	}
 
-	public void setEditDate(LocalDate editDate) {
+	public void setEditDate(LocalDateTime editDate) {
 		this.editDate = editDate;
 	}
 

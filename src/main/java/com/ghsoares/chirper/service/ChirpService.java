@@ -1,6 +1,6 @@
 package com.ghsoares.chirper.service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -36,19 +36,21 @@ public class ChirpService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't exist", null);
 		}
 		chirp.setAuthor(user.get());
-		chirp.setCreationDate(LocalDate.now());
+		chirp.setCreationDate(LocalDateTime.now());
 		chirp.setEditDate(chirp.getCreationDate());
 		chirp.setTags(getBodyTags(chirp.getBody()));
 		return Optional.of(chirpRepository.save(chirp));
 	}
 	
 	public Optional<Chirp> updateChirp(Long userId, Chirp chirp) {
-		if (userId != chirp.getAuthor().getUserId()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trying to update a chirp from a different user", null);
-		}
-		
 		if (chirpRepository.findById(chirp.getChirpId()).isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Chirp doesn't exist", null);
+		}
+		
+		Optional<Chirp> prevChirp = chirpRepository.findById(chirp.getChirpId());
+		
+		if (userId != prevChirp.get().getAuthor().getUserId()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Trying to update a chirp from a different user", null);
 		}
 		
 		Optional<User> user = userRepository.findById(userId);
@@ -56,8 +58,12 @@ public class ChirpService {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't exist", null);
 		}
 		
-		chirp.setEditDate(LocalDate.now());
-		return Optional.of(chirpRepository.save(chirp));
+		if (chirp.getBody() != null) {
+			prevChirp.get().setBody(chirp.getBody());
+		}
+		
+		prevChirp.get().setEditDate(LocalDateTime.now());
+		return Optional.of(chirpRepository.save(prevChirp.get()));
 	}
 	
 	public Optional<ChirpLike> likeChirp(Long userId, Long chirpId) {

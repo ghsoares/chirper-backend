@@ -10,4 +10,10 @@ public class ChirperApplication {
 		SpringApplication.run(ChirperApplication.class, args);
 	}
 
+//	@Bean
+//	public ObjectMapper objectMapper() {
+//	    ObjectMapper objectMapper = new ObjectMapper();
+//	    objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true);
+//	    return objectMapper;
+//	}
 }
